@@ -1,0 +1,15 @@
+{
+    "projectName": "Rbot",
+    "languages": [{
+        "id": "rbot",
+        "grammar": "src/language/rbot.langium",
+        "fileExtensions": [".rbt"],
+        "textMate": {
+            "out": "syntaxes/rbot.tmLanguage.json"
+        },
+        "monarch": {
+            "out": "syntaxes/rbot.monarch.ts"
+        }
+    }],
+    "out": "src/language/generated"
+}

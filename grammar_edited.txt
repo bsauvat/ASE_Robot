@@ -1,0 +1,97 @@
+```
+grammar Robot
+
+entry Robot:
+	Function+=Function*;
+
+Function:
+    'def' name=ID ('(' (args+=DeclaredParameter (',' args+=DeclaredParameter)*)? ')')
+        body=Body;
+
+Body:
+ '{'statements+=Statement'}';
+
+DeclaredParameter:
+    name=ID;
+
+Statement:
+	Deplacement | ControlStructure | VariableDeclaration | VariableUpdate | Call_function;
+
+Deplacement:
+	Forward | Backward | StrafeLeft | StrafeRight | SpeedCommand | Rotate;
+
+ControlStructure:
+	(If | While | Else) BooleanExpression Body;
+
+VariableDeclaration:
+	'var' name=ID '=' term;
+
+UpdateVariable:
+	variableName=[VariableDeclaration:ID] '=' term;
+
+CallVariable:
+    variableCall=[VariableDeclaration:ID];
+
+CallFunction:
+	function=[Fn:ID] '(' (args+=DeclaredParameter(',' args+=DeclaredParameter)*)? ')';
+
+ArithmeticExpression:
+	term (OperandMath term)*;
+
+OperandMath returns string:
+	'+' | '-' | '*' | '/';
+
+Unit returns string:
+	'mm'|'cm'|'m';
+
+BooleanExpression:
+	term + (OperandBool term)*;
+
+OperandBool returns string:
+	'>' | '>=' | '<' | '=<' | '!=' | '==' | 'and' | 'or';
+
+BooleanValue returns string:
+	'True' | 'False';
+
+term:
+	Call_Variable | Call_function | ArithmeticExpression | GetSensors | DeclaredParameter | BooleanValue | INT;
+
+GetSensor:
+    timestamp=GetTimestamp | speed=GetSpeed | distance=GetDistance;
+
+GetTimestamp returns string:
+    'get_timestamp';
+
+GetSpeed returns string:
+    'get_speed';
+
+GetDistance returns string:
+    'get_distance';
+
+GoForward:
+    'forward' distance=ArithmeticExpression unit=Unit;
+
+GoBackward:
+    'backward' distance=ArithmeticExpression unit=Unit;
+
+StrafeLeft
+    'strafeleft' distance=ArithmeticExpression unit=Unit;
+
+StrafeRight:
+    'straferight' distance=ArithmeticExpression unit=Unit;
+
+Rotate:
+    'rotate' angle=ArithmeticExpression;
+
+SpeedCommand:
+	'setspeed' speed=ArithmeticExpression;
+
+
+hidden terminal WS: /\s+/;
+terminal ID: /[_a-zA-Z][\w_]*/;
+terminal INT returns number: /[0-9]+/;
+terminal STRING: /"(\\.|[^"\\])*"|'(\\.|[^'\\])*'/;
+
+hidden terminal ML_COMMENT: /\/\*[\s\S]*?\*\//;
+hidden terminal SL_COMMENT: /\/\/[^\n\r]*/;
+```
