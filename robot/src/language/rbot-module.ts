@@ -1,6 +1,6 @@
 import type { DefaultSharedModuleContext, LangiumServices, LangiumSharedServices, Module, PartialLangiumServices } from 'langium';
 import { createDefaultModule, createDefaultSharedModule, inject } from 'langium';
-import { RbotGeneratedModule, RbotGeneratedSharedModule } from './generated/module.js';
+import { RobotGeneratedModule, RbotGeneratedSharedModule } from './generated/module.js';
 import { RbotValidator, registerValidationChecks } from './rbot-validator.js';
 
 /**
@@ -54,7 +54,7 @@ export function createRbotServices(context: DefaultSharedModuleContext): {
     );
     const Rbot = inject(
         createDefaultModule({ shared }),
-        RbotGeneratedModule,
+        RobotGeneratedModule,
         RbotModule
     );
     shared.ServiceRegistry.register(Rbot);
