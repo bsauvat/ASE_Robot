@@ -1,23 +1,26 @@
 grammar Robot
 
 entry Robot:
-	Fonction+=Fonction*;
+	functions+=Fonction*;
 
 Fonction:
     'def' name=ID '(' (args+=DeclaredParameter (',' args+=DeclaredParameter)*)? ')'
-        body=Body;
+        functionBody=Body;
 
 Body:
  '{' (statements+=Statement)* '}';
 
 DeclaredParameter:
-    name=ID;
+    paramName=ID;
 
 Statement:
-	 ControlStructure | ((Deplacement | VariableDeclaration | UpdateVariable | CallFunction | Return) ';');
+	ControlStructure | ((Deplacement | VariableDeclaration | UpdateVariable | CallFunction | Print | Return) ';');
 
 Return:
-	'return' Expression;
+	'return' return=Expression;
+
+Print:
+	'print(' print=Expression ')';
 
 Deplacement:
 	Forward | Backward | StrafeLeft | StrafeRight | SpeedCommand | Rotate;
@@ -26,22 +29,22 @@ ControlStructure:
 	Condition | Loop ;
 
 Loop:
-	'while' loop=Expression body=Body;
+	'while' loop=Expression loopBody=Body;
 
 Condition:
-	'if' ifcondition=Expression ifbody=Body ('else' 'if' elseifcondition+=Expression esleifbody+=Body)* ('else' elsebody=Body)* ;
+	'if' ifCondition=Expression ifBody=Body ('else' 'if' elseifCondition+=Expression esleifBody+=Body)* ('else' elseBody=Body)* ;
 
 VariableDeclaration:
-	'var' name=ID '=' value=Expression;
+	'var' name=ID '=' varValue=Expression;
 
 UpdateVariable:
-	variableName=[VariableDeclaration:ID] '=' newvalue=Expression;
+	varName=[VariableDeclaration:ID] '=' newValue=Expression;
 
 CallVariable:
-    variableCall=[VariableDeclaration:ID] | parameterCall=[DeclaredParameter:ID];
+    varName=[VariableDeclaration:ID] | param=[DeclaredParameter:ID];
 
 CallFunction:
-	function=[Fonction:ID] '(' (args+=Expression (',' args+=Expression)*)? ')';
+	functionName=[Fonction:ID] '(' (args+=Expression (',' args+=Expression)*)? ')';
 
 ArithmeticExpression:
 	PlusMinus;
@@ -73,24 +76,15 @@ Term infers Expression:
 	'(' Expression ')' | "not" expression=Term | param=DeclaredParameter | atom=Atomic;
 
 Atomic infers Expression:
-	value=INT | '-' value=INT |
-	value=STRING |
-	value=('true' | 'false') |
-	variable=CallVariable |
-	function=CallFunction |
+	{infer INT_const} value=INT |{infer INT_neg_const}'-' value=INT |
+	{infer STRING_const} value=STRING |
+	{infer BOOL_const} value=('true' | 'false') |
+	callVar=CallVariable |
+	callFunction=CallFunction |
 	sensor=GetSensor;
 
 GetSensor:
-    timestamp=GetTimestamp | speed=GetSpeed | distance=GetDistance;
-
-GetTimestamp returns string:
-    'get_timestamp';
-
-GetSpeed returns string:
-    'get_speed';
-
-GetDistance returns string:
-    'get_distance';
+    {infer GetTimestamp} "get_timestamp()" | {infer GetDistance} "get_distance()" | {infer GetSpeed} "get_speed()";
 
 Forward:
     'forward' distance=ArithmeticExpression unit=Unit;
